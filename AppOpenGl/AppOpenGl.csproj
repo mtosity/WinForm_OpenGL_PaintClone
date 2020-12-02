@@ -52,13 +52,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DrawSnapshot.cs" />
+    <Compile Include="DrawHelper.cs" />
+    <Compile Include="DrawPoints.cs" />
+    <Compile Include="DrawChosenOption.cs" />
+    <Compile Include="DrawRandomPolygon.cs" />
+    <Compile Include="FillColorScanline.cs" />
+    <Compile Include="FillColorSpread.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="LineData.cs" />
+    <Compile Include="Polygon.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Form1.resx">

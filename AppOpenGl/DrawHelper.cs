@@ -61,14 +61,17 @@ namespace AppOpenGl
             lineWidth = nLineWidth;
         }
 
+        public void setPoints(List<Point> nPoints)
+        {
+            listPoints = new List<Point>(nPoints);
+        }
+
         public void draw()
         {
             gl.Color(color.R / 255.0, color.G / 255.0, color.B / 255.0, 0.0f);
             gl.LineWidth(lineWidth);
             gl.PointSize(pointSize);
             gl.Begin(openglMode);
-
-            //Console.WriteLine(listPoints.Count);
 
             foreach(Point p in listPoints)
             {

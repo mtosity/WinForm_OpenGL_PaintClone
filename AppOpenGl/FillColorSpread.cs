@@ -108,7 +108,6 @@ namespace AppOpenGl
 
             while (sp.Count > 0)
             {
-                Console.WriteLine("LOOP");
                 Point np = sp.Pop();
                 if (np.X < gl.RenderContextProvider.Width && np.Y < gl.RenderContextProvider.Height && np.X >= 0 && np.Y >= 0) // o trong opengl provider
                 {

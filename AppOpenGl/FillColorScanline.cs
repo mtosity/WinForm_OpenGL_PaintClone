@@ -12,8 +12,8 @@ namespace AppOpenGl
     {
         private OpenGL gl;
         private Color fillColor = Color.Black;
-        private List<Point> listPoints = new List<Point>();
-        private List<Point> filledPoints = new List<Point>();
+        private List<Point> listPoints = new List<Point>(); // nhung diem cua da giac
+        private List<Point> filledPoints = new List<Point>(); // nhung diem da to, luu lai de truyen vao ham draw cho nhung ve sau
 
         public FillColorScanline(OpenGL ngl, List<Point> nPoints)
         {
@@ -21,21 +21,7 @@ namespace AppOpenGl
             listPoints = nPoints;
         }
 
-        private Dictionary<string, double> calAllLinesDelta() // {name: delta} ex: {"01": 2.3}
-        {
-            Dictionary<string, double> result = new Dictionary<string, double>();
-            int n = listPoints.Count;
-            if (n > 2)
-            {
-                for(int i=0;i<n;i++)
-                {
-                    result.Add(i.ToString() + ((i + 1) % n).ToString(), 1.0 * (listPoints[i].Y - listPoints[(i + 1) % n].Y) / (listPoints[i].X - listPoints[(i + 1) % n].X));
-                }
-            }
-            return result;
-        }
-
-        private List<LineData> getLinesByPoints()
+        private List<LineData> getLinesByPoints() // tu nhung diem 
         {
             List<LineData> re = new List<LineData>();
             int n = listPoints.Count;
@@ -46,12 +32,12 @@ namespace AppOpenGl
                 {
                     if(i == 0)
                     {
-                        LineData nLine = new LineData(preP, listPoints[i], (listPoints.Count - 1).ToString() + i.ToString());
+                        LineData nLine = new LineData(preP, listPoints[i]);
                         re.Add(nLine);
                     }
                     else
                     {
-                        LineData nLine = new LineData(preP, listPoints[i], (i - 1).ToString() + i.ToString());
+                        LineData nLine = new LineData(preP, listPoints[i]);
                         re.Add(nLine);
                     }
                     preP = listPoints[i];
@@ -148,19 +134,6 @@ namespace AppOpenGl
 
                     if (listPointsFill.Count >= 2)
                     {
-                        /*
-                        gl.Begin(OpenGL.GL_LINES);
-                        gl.Color(fillColor.R / 255.0, fillColor.G / 255.0, fillColor.B / 255.0, 0.0f);
-                        //gl.LineWidth(width);
-                        //Console.WriteLine(listPointsFill.Count);
-                        foreach (Point p in listPointsFill)
-                        {
-                            gl.Vertex(p.X, p.Y);
-                        }
-                        gl.End();
-                        gl.Flush();
-                        */
-
                         foreach (Point p in listPointsFill)
                         {
                             filledPoints.Add(new Point(p.X, p.Y));

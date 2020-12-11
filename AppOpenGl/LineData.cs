@@ -10,21 +10,22 @@ namespace AppOpenGl
     class LineData //support class cho viec scanline
     {
         private Point pStart, pEnd;
-        public string name; // "01", "12"...
+
         // addition data init
         public int xmin = 0, xmax = 0, ymin = 0, ymax = 0;
         private double delta; // dy / dx
+
         // addition data update
         private int xLineGoThrough = 0, yLineGoThrough = 0;
         private int modeLineGoThrough = 0; // # 3th, 0 no, 1 start, 2 middle, 3 end
 
+        //constant data
         public const int THROUGH_NONE = 0, THROUGH_START = 1, THROUGH_MIDDLE = 2, THROUGH_END = 3;
 
-        public LineData(Point start, Point end, string nName)
+        public LineData(Point start, Point end)
         {
             pStart = start;
             pEnd = end;
-            name = nName;
             if(pStart.X > pEnd.X)
             {
                 xmax = pStart.X;

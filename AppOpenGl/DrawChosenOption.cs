@@ -11,124 +11,96 @@ namespace AppOpenGl
     class DrawChosenOption
     {
         private int mode = 0; // ve hinh gi? vd: 0: duong thang, 1: duong tron,...
-        public const double pi = 3.1415926f;
-        public const int DRAW_LINE = 0, DRAW_CIRCLE = 1, DRAW_RECTANGLE = 2, DRAW_TRIANGLE = 3, DRAW_ELIPSE = 4, DRAW_PENTAGON = 5, DRAW_HEXAGON = 6;
-        private Point pStart, pEnd;
+        private Point pStart, pEnd; // y = gl.Height - y
         private OpenGL gl;
-        private Color color = Color.Black;
-        private float lineWidth;
 
-        public DrawChosenOption(int newMode, Point nStart, Point nEnd, OpenGL ngl, Color newColor, float newLineWidth)
+        //constant data
+        public const int DRAW_RANDOM = -1, DRAW_LINE = 0, DRAW_CIRCLE = 1, DRAW_RECTANGLE = 2, DRAW_TRIANGLE = 3, DRAW_ELIPSE = 4, DRAW_PENTAGON = 5, DRAW_HEXAGON = 6;
+
+        public DrawChosenOption(int newMode, Point nStart, Point nEnd, OpenGL ngl)
         {
             mode = newMode;
             pStart = nStart;
             pEnd = nEnd;
             gl = ngl;
-            color = newColor;
-            lineWidth = newLineWidth;
         }
 
-        private void drawEqualPolygon(int egdeNum) // ve da giac deu cho so canh, pStart = tam - pEnd = 1 diem trong da giac
+        public DrawChosenOption(int newMode, List<Point> controlPoints, OpenGL ngl)
         {
-            gl.Begin(OpenGL.GL_LINE_LOOP);
-            double x1 = pStart.X, x2 = pEnd.X, y1 = gl.RenderContextProvider.Height - pStart.Y, y2 = gl.RenderContextProvider.Height - pEnd.Y,
-              AB = Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
-            double r = Math.Sqrt(Math.Pow(y2 - y1, 2) + Math.Pow(x2 - x1, 2)),
-                alpha = Math.Atan2((x2 - x1), (y2 - y1));
-            for (double ii = 0; ii < egdeNum; ii++)
+            Console.WriteLine("DrawChosenOption");
+            foreach(Point p in controlPoints)
             {
-                double theta = (2.0f * pi * ii / egdeNum + pi / 2 - alpha);//get the current angle 
-                double x = r * Math.Cos(theta);//calculate the x component 
-                double y = r * Math.Sin(theta);//calculate the y component 
-                gl.Vertex(x1 + x, y1 + y);//output vertex 
+                Console.WriteLine(p.ToString());
             }
-            gl.End();
-            gl.Flush();
+            mode = newMode;
+            gl = ngl;
+            if (controlPoints.Count >= 2)
+            {
+                if (newMode == DRAW_LINE)
+                {
+                    pStart = controlPoints[0];
+                    pEnd = controlPoints[1];
+                } else if(newMode == DRAW_TRIANGLE)
+                {
+                    pStart.X = (controlPoints[0].X + controlPoints[1].X + controlPoints[2].X) / 3;
+                    pStart.Y = (controlPoints[0].Y + controlPoints[1].Y + controlPoints[2].Y) / 3;
+                    pEnd = controlPoints[2];
+                } else if(newMode == DRAW_RECTANGLE)
+                {
+                    pStart.X = (controlPoints[0].X + controlPoints[1].X + controlPoints[2].X + controlPoints[3].X) / 4;
+                    pStart.Y = (controlPoints[0].Y + controlPoints[1].Y + controlPoints[2].Y + controlPoints[3].Y) / 4;
+                    pEnd = controlPoints[3];
+                } else if(newMode == DRAW_PENTAGON)
+                {
+                    pStart.X = (controlPoints[0].X + controlPoints[1].X + controlPoints[2].X + controlPoints[3].X + controlPoints[4].X) / 5;
+                    pStart.Y = (controlPoints[0].Y + controlPoints[1].Y + controlPoints[2].Y + controlPoints[3].Y + controlPoints[4].Y) / 5;
+                    pEnd = controlPoints[4];
+                } else if (newMode == DRAW_HEXAGON)
+                {
+                    pStart.X = (controlPoints[0].X + controlPoints[1].X + controlPoints[2].X + controlPoints[3].X + controlPoints[4].X + controlPoints[5].X) / 5;
+                    pStart.Y = (controlPoints[0].Y + controlPoints[1].Y + controlPoints[2].Y + controlPoints[3].Y + controlPoints[4].Y + controlPoints[5].Y) / 5;
+                    pEnd = controlPoints[5];
+                } else if (newMode == DRAW_CIRCLE)
+                {
+                    pStart = controlPoints[0];
+                    pEnd = controlPoints[1];
+                } else if (newMode == DRAW_ELIPSE)
+                {
+                    pStart = controlPoints[0];
+                    pEnd = new Point(controlPoints[1].X, controlPoints[2].Y);
+                }
+            }
         }
 
         private List<Point> getControlPointsFromEqualPolygon(int pNum)
         {
             List<Point> listP = new List<Point>();
-            double x1 = pStart.X, x2 = pEnd.X, y1 = gl.RenderContextProvider.Height - pStart.Y, y2 = gl.RenderContextProvider.Height - pEnd.Y,
+            double x1 = pStart.X, x2 = pEnd.X, y1 = pStart.Y, y2 = pEnd.Y,
               AB = Math.Sqrt(Math.Pow(x1 - x2, 2) + Math.Pow(y1 - y2, 2));
             double r = Math.Sqrt(Math.Pow(y2 - y1, 2) + Math.Pow(x2 - x1, 2)),
                 alpha = Math.Atan2((x2 - x1), (y2 - y1));
             for (double ii = 0; ii < pNum; ii++)
             {
-                double theta = (2.0f * pi * ii / pNum + pi / 2 - alpha);//get the current angle 
+                double theta = (2.0f * Config.pi * ii / pNum + Config.pi / 2 - alpha);//get the current angle 
                 double x = r * Math.Cos(theta);//calculate the x component 
                 double y = r * Math.Sin(theta);//calculate the y component 
-                //gl.Vertex(x1 + x, y1 + y);//output vertex 
                 listP.Add(new Point((int)(x1 + x), (int)(y1 + y)));
             }
             return listP;
         }
 
-        public void draw()
+        private bool isListPointsClockWise(List<Point> points)
         {
-            gl.Color(color.R / 255.0, color.G / 255.0, color.B / 255.0, 0.0f);
-            gl.LineWidth(lineWidth);
-
-            if (mode == DRAW_LINE)
+            //https://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
+            int smallestYIndex = 0, n = points.Count;
+            for(int i=1;i<n;i++)
             {
-                gl.Begin(OpenGL.GL_LINES);
-                gl.Vertex(pStart.X, gl.RenderContextProvider.Height - pStart.Y);
-                gl.Vertex(pEnd.X, gl.RenderContextProvider.Height - pEnd.Y);
-                gl.End();
-                gl.Flush();
-            }
-            else if (mode == DRAW_CIRCLE)
-            {
-                drawEqualPolygon(450);
-            }
-            else if (mode == DRAW_RECTANGLE)
-            {
-                drawEqualPolygon(4);
-            }
-            else if (mode == DRAW_TRIANGLE)
-            {
-                drawEqualPolygon(3);
-            }
-            else if (mode == DRAW_PENTAGON)
-            {
-                drawEqualPolygon(5);
-            }
-            else if (mode == DRAW_HEXAGON)
-            {
-                drawEqualPolygon(6);
-            }
-            else if (mode == DRAW_ELIPSE)
-            {
-                /*
-                 If the ellipse is ((x-cx)/a)^2 + ((y-cy)/b)^2 = 1 then change the glVertex2f call to glVertext2d(a*x + cx, b*y + cy);
-                 https://stackoverflow.com/questions/5886628/effecient-way-to-draw-ellipse-with-opengl-or-d3d
-                 */
-                double x1 = pStart.X, x2 = pEnd.X, y1 = gl.RenderContextProvider.Height - pStart.Y, y2 = gl.RenderContextProvider.Height - pEnd.Y;
-                // tinh r1, r2
-                double rx = Math.Abs(x1 - x2), ry = Math.Abs(y1 - y2);
-
-                double theta = 2 * 3.1415926 / 360.0;
-                double c = Math.Cos(theta);//precalculate the sine and cosine
-                double s = Math.Sin(theta);
-                double t;
-
-                double x = 1;//we start at angle = 0 
-                double y = 0;
-
-                gl.Begin(OpenGL.GL_LINE_LOOP);
-                for (double ii = 0; ii < 360.0; ii++)
+                if(points[i].Y < points[smallestYIndex].Y)
                 {
-                    //apply radius and offset
-                    gl.Vertex(x * rx + x1, y * ry + y1);//output vertex 
-
-                    //apply the rotation matrix
-                    t = x;
-                    x = c * x - s * y;
-                    y = s * t + c * y;
+                    smallestYIndex = i;
                 }
-                gl.End();
-                gl.Flush();
             }
+            return points[(smallestYIndex + 1) % n].X < points[(smallestYIndex - 1) < 0 ? (n - 1) : (smallestYIndex - 1)].X;
         }
 
         public List<Point> getControlPoints()
@@ -162,11 +134,12 @@ namespace AppOpenGl
             }
             else if (mode == DRAW_ELIPSE)
             {
-                double x1 = pStart.X, x2 = pEnd.X, y1 = gl.RenderContextProvider.Height - pStart.Y, y2 = gl.RenderContextProvider.Height - pEnd.Y;
+                listP.Add(pStart);
+                double x1 = pStart.X, x2 = pEnd.X, y1 = pStart.Y, y2 = pEnd.Y;
                 // tinh r1, r2
                 double rx = Math.Abs(x1 - x2), ry = Math.Abs(y1 - y2);
 
-                double theta = 2 * 3.1415926 / 360.0;
+                double theta = 2 * 3.1415926 / 4;
                 double c = Math.Cos(theta);//precalculate the sine and cosine
                 double s = Math.Sin(theta);
                 double t;
@@ -187,8 +160,9 @@ namespace AppOpenGl
             }
 
             // vi 1 la theo chieu kim dong ho, 2 la nguoc chieu => neu nguoc chieu thi doi nguoc lai
-            if (listP[1].X < listP[0].X)
+            if (!isListPointsClockWise(listP) && mode != DRAW_CIRCLE && mode != DRAW_ELIPSE)
             {
+                Console.WriteLine("Reversed");
                 listP.Reverse();
             }
             return listP;
@@ -199,9 +173,8 @@ namespace AppOpenGl
             List<Point> re = new List<Point>();
             if (mode == DRAW_LINE)
             {
-                Point start = new Point(pStart.X, gl.RenderContextProvider.Height - pStart.Y), end = new Point(pEnd.X, gl.RenderContextProvider.Height - pEnd.Y);
-                re.Add(start);
-                re.Add(end);
+                re.Add(pStart);
+                re.Add(pEnd);
             }
             else if (mode == DRAW_CIRCLE)
             {
@@ -229,7 +202,7 @@ namespace AppOpenGl
                  If the ellipse is ((x-cx)/a)^2 + ((y-cy)/b)^2 = 1 then change the glVertex2f call to glVertext2d(a*x + cx, b*y + cy);
                  https://stackoverflow.com/questions/5886628/effecient-way-to-draw-ellipse-with-opengl-or-d3d
                  */
-                double x1 = pStart.X, x2 = pEnd.X, y1 = gl.RenderContextProvider.Height - pStart.Y, y2 = gl.RenderContextProvider.Height - pEnd.Y;
+                double x1 = pStart.X, x2 = pEnd.X, y1 = pStart.Y, y2 = pEnd.Y;
                 // tinh r1, r2
                 double rx = Math.Abs(x1 - x2), ry = Math.Abs(y1 - y2);
 

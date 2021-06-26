@@ -1,6 +1,6 @@
 # Paint Clone using Windows Form and OpenGL
 
-### HCMUS Computer Graphics 2020 course project
+## Computer Graphics 2020 course project
 
 Demo (Direct to Youtube)
 
